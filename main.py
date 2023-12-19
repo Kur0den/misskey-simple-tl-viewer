@@ -13,6 +13,7 @@ def setup():
     config["instance"] = input("Instance: ")
     config["token"] = input("Token: ")
     config["name_len"] = 25
+    config["content_len"] = 1000
     config["line_len"] = 50
     json.dump(config, open("config.json", "w"))
 
