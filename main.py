@@ -22,7 +22,7 @@ def pick_data(res, config):
     cat_re_2 = re.compile(r"(な)", re.IGNORECASE)
     cat_re_3 = re.compile(r"(ナ)", re.IGNORECASE)
     count = 0
-    name = res["user"]["name"]
+    name = res["user"]["name"] if res["user"]["name"] is not None else res["user"]["username"]
     for char in name:
         if unicodedata.east_asian_width(char) in ("F", "W", "A"):
             count += 2
@@ -121,11 +121,11 @@ async def main():
                         if res["renoteId"] is not None:
                             print("-"*config["line_len"])
                             rn_data = pick_data(res["renote"], config)
-                            print_data(rn_data, res, config, "rn")
+                            print_data(rn_data, res["renote"], config, "rn")
                         if res["replyId"] is not None:
                             print("-"*config["line_len"])
                             rn_data = pick_data(res["reply"], config)
-                            print_data(rn_data, res, config, "rp")
+                            print_data(rn_data, res["reply"], config, "rp")
                         print("=" * config["line_len"])
 
         except websockets.exceptions.ConnectionClosedError:
