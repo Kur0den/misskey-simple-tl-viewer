@@ -1,13 +1,15 @@
-import websockets
+import asyncio
 import json
 import os
-from uuid import uuid4
-import asyncio
-from datetime import datetime, timedelta
 import re
+import sys
 import unicodedata
+from datetime import datetime, timedelta
+from uuid import uuid4
 
-file_path: str = os.path.dirname(os.path.abspath(__file__))
+import websockets
+
+file_path: str = os.path.dirname(sys.argv[0])
 
 
 def setup():
