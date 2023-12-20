@@ -3,7 +3,7 @@ import json
 import os
 from uuid import uuid4
 import asyncio
-from datetime import datetime
+from datetime import datetime, timedelta
 import re
 import unicodedata
 
@@ -43,7 +43,7 @@ def pick_data(res, config):
 
     # 時間の抽出
     time = datetime.strftime(
-        datetime.fromisoformat(res["createdAt"]),
+        datetime.fromisoformat(res["createdAt"][:-1]) + timedelta(hours=9),
         "%Y-%m-%dT%H:%M:%S",
     ).ljust(config["name_len"])
 
@@ -113,7 +113,7 @@ async def main():
                 print("=" * config["line_len"])
                 while True:
                     res = json.loads(await ws.recv())
-                    if res["body"]["id"] == id:
+                    if res["body"].get("id") == id:
                         res = res["body"]["body"]
                         # 情報の抽出
                         data = pick_data(res, config)
