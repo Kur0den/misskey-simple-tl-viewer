@@ -15,6 +15,7 @@ def setup():
     config["name_len"] = 25
     config["content_len"] = 1000
     config["line_len"] = 50
+    config["time_shift"] = 9
     json.dump(config, open("config.json", "w"))
 
 
@@ -43,7 +44,7 @@ def pick_data(res, config):
 
     # 時間の抽出
     time = datetime.strftime(
-        datetime.fromisoformat(res["createdAt"][:-1]) + timedelta(hours=9),
+        datetime.fromisoformat(res["createdAt"][:-1]) + timedelta(hours=config["time_shift"]),
         "%Y-%m-%dT%H:%M:%S",
     ).ljust(config["name_len"])
 
