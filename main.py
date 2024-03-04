@@ -157,7 +157,10 @@ async def main():
                             print_data(rn_data, res["reply"], config, "rp")
                         print("=" * config["line_len"])
 
-        except websockets.exceptions.ConnectionClosedError:
+        except (
+            websockets.exceptions.ConnectionClosedError,
+            websockets.exceptions.ConnectionClosedOK,
+        ):
             print("Connection closed")
             print("Reconnecting...")
             print("-" * 30)
