@@ -1,4 +1,5 @@
 import re
+import unicodedata
 
 def nyaize(content):
     cat_re_1 = re.compile(r"(na)", re.IGNORECASE)
@@ -11,16 +12,55 @@ def nyaize(content):
 
     return content
 
+def name_counter(name):
+    count = 0
+    for char in name:
+        match unicodedata.east_asian_width(char):
+            case "W" | "F":  # 全角文字等
+                count += 2  # 2文字分増やす
+            case "a":  # 曖昧な文字
+                pass  # 何もしない
+            case _:  # その他
+                count += 1  # 1文字分増やす
+    return count
+
+
+def name_formatter(name, name_len, config):
+    TARGET_LEN = config["name_len"] - len("... ")  # 設定値から...の分を引く
+    for char in name[::-1]:  #  文字列を逆順にして文字数を減らしていく
+        match unicodedata.east_asian_width(char):
+            case "W" | "F":  # 全角文字
+                name_len -= 2  # 2文字分減らす
+                name = name[:-1]
+            case "a":  # 曖昧な文字
+                pass  # 何もしない
+            case _: # その他
+                name_len -= 1 # 1文字分減らす
+                name = name[:-1]
+        if name_len <= TARGET_LEN:  # 設定値以下になったらbreak
+            break
+    format_name = name + "... "  # 省略を示す...を追加
+    return format_name
 
 def get_name(res, config):
-    count = 0
-    count = len(res["user"]["username"])
-    name = res["user"]["username"]
-    if count > config["name_len"]:
-        name = name[: (count - config["name_len"]) - 3] + "..."
-        count = count + 3
-    name += " " * (config["name_len"] - count)
-    return name
+    # ユーザー名を取得
+    # ユーザー名がない場合はハンドルを取得
+    name = (
+        res["user"]["name"]
+        if res["user"]["name"] is not None
+        else res["user"]["username"]
+    )
+    # ここでのcountは文字数
+    count = name_counter(name)
+
+    # 文字数が設定値を超えている場合は省略
+    if (config["name_len"] - 1) - count < 0:
+        format_name = name_formatter(name, count, config)
+    else:  # 超えていない場合はnameをそのまま
+        format_name = name
+    # 設定値に満たない場合はスペースで埋める
+    format_name = format_name + " " * (config["name_len"] - name_counter(format_name))
+    return format_name
 
 def get_uid(res):
     uid = "@" + res["user"]["username"]
