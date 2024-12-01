@@ -10,7 +10,10 @@ import requests
 
 import websockets
 
+
+
 file_path: str = os.path.dirname(sys.argv[0])
+
 
 
 def setup():
@@ -21,7 +24,7 @@ def setup():
     config["content_len"] = 1000
     config["line_len"] = 50
     config["time_shift"] = 9
-    json.dump(config, open(file_path + "/config.json", "w"))
+    json.dump(config, open("./config.json", "w"))
 
 
 def pick_data(res, config):
@@ -104,7 +107,7 @@ def print_data(data, res, config, indent=""):
 
 
 async def main():
-    config = json.load(open(file_path + "/config.json", "r"))
+    config = json.load(open("./config.json", "r"))
     mode_list = {
         "h": "homeTimeline",
         "l": "localTimeline",
@@ -167,6 +170,6 @@ async def main():
 
 
 if __name__ == "__main__":
-    if not os.path.exists(file_path + "/config.json"):
+    if not os.path.exists("./config.json"):
         setup()
     asyncio.run(main())
