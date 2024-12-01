@@ -30,28 +30,10 @@ def setup():
 
 
 def pick_data(res, config):
-    count = 0
-    name = (
-        res["user"]["name"]
-        if res["user"]["name"] is not None
-        else res["user"]["username"]
-    )
-    for char in name:
-        if unicodedata.east_asian_width(char) in ("F", "W", "A"):
-            count += 2
-        else:
-            count += 1
-    if count > config["name_len"]:
-        name = name[: (count - config["name_len"]) - 3] + "..."
-        count = count + 3
-    name += " " * (config["name_len"] - count)
-    uid = "@" + res["user"]["username"]
-    # ホストの抽出
-    if res["user"]["host"] is not None:
-        uid += "@" + res["user"]["host"]
-        host_name = res["user"]["instance"]["name"]
-    else:
-        host_name = "This instance"
+    # 名前の抽出
+    name = content_format.get_name(res, config)
+    uid = content_format.get_uid(res)
+    host_name = content_format.get_instance_name(res)
 
     # 時間の抽出
     time = datetime.strftime(
