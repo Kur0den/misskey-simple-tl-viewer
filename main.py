@@ -10,6 +10,7 @@ import requests
 
 import websockets
 
+from modules import content_format
 
 
 file_path: str = os.path.dirname(sys.argv[0])
@@ -28,9 +29,6 @@ def setup():
 
 
 def pick_data(res, config):
-    cat_re_1 = re.compile(r"(na)", re.IGNORECASE)
-    cat_re_2 = re.compile(r"(な)", re.IGNORECASE)
-    cat_re_3 = re.compile(r"(ナ)", re.IGNORECASE)
     count = 0
     name = (
         res["user"]["name"]
@@ -67,9 +65,8 @@ def pick_data(res, config):
     if content is not None:
         # cat
         if res["user"]["isCat"]:
-            content = cat_re_1.sub("nya", content)
-            content = cat_re_2.sub("にゃ", content)
-            content = cat_re_3.sub("ニャ", content)
+            content = content_format.nyaize(content)
+
     else:
         content = "No content"
     return {
