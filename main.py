@@ -63,7 +63,7 @@ def pick_data(res, config):
     cw = res["cw"]
     content = res["text"]
     if content is not None:
-        # cat
+        # isCat
         if res["user"]["isCat"]:
             content = content_format.nyaize(content)
 
