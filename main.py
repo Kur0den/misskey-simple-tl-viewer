@@ -51,7 +51,7 @@ def pick_data(res, config):
             content = content_format.nyaize(content)
 
     else:
-        content = "No content"
+        content = "[No content]"
     return {
         "name": name,
         "uid": uid,
