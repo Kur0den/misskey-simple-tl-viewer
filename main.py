@@ -36,22 +36,11 @@ def pick_data(res, config):
     host_name = content_format.get_instance_name(res)
 
     # 時間の抽出
-    time = datetime.strftime(
-        datetime.fromisoformat(res["createdAt"][:-1])
-        + timedelta(hours=config["time_shift"]),
-        "%Y-%m-%dT%H:%M:%S",
-    ).ljust(config["name_len"])
+    time = content_format.get_time(res, config)
 
     # 内容の抽出
-    cw = res["cw"]
-    content = res["text"]
-    if content is not None:
-        # isCat
-        if res["user"]["isCat"]:
-            content = content_format.nyaize(content)
+    cw, content = content_format.get_content(res)
 
-    else:
-        content = "[No content]"
     return {
         "name": name,
         "uid": uid,

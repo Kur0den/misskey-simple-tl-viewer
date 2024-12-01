@@ -1,16 +1,7 @@
 import re
 import unicodedata
+from datetime import datetime, timedelta
 
-def nyaize(content):
-    cat_re_1 = re.compile(r"(na)", re.IGNORECASE)
-    cat_re_2 = re.compile(r"(な)", re.IGNORECASE)
-    cat_re_3 = re.compile(r"(ナ)", re.IGNORECASE)
-
-    content = cat_re_1.sub("nya", content)
-    content = cat_re_2.sub("にゃ", content)
-    content = cat_re_3.sub("ニャ", content)
-
-    return content
 
 def name_counter(name):
     count = 0
@@ -34,13 +25,14 @@ def name_formatter(name, name_len, config):
                 name = name[:-1]
             case "a":  # 曖昧な文字
                 pass  # 何もしない
-            case _: # その他
-                name_len -= 1 # 1文字分減らす
+            case _:  # その他
+                name_len -= 1  # 1文字分減らす
                 name = name[:-1]
         if name_len <= TARGET_LEN:  # 設定値以下になったらbreak
             break
     format_name = name + "... "  # 省略を示す...を追加
     return format_name
+
 
 def get_name(res, config):
     # ユーザー名を取得
@@ -62,13 +54,15 @@ def get_name(res, config):
     format_name = format_name + " " * (config["name_len"] - name_counter(format_name))
     return format_name
 
+
 def get_uid(res):
     uid = "@" + res["user"]["username"]
     if res["user"]["host"] is not None:
         uid += "@" + res["user"]["host"]
     return uid
 
-def get_instance_name(res):# -> Any | Literal['No instance name']:
+
+def get_instance_name(res):  # -> Any | Literal['No instance name']:
     if res["user"]["host"] is not None:
         if res["user"]["instance"]["name"] is not None:
             return res["user"]["instance"]["name"]
@@ -76,3 +70,34 @@ def get_instance_name(res):# -> Any | Literal['No instance name']:
             return "No instance name"
     else:
         return "Local"
+
+
+def get_time(res, config):
+    return datetime.strftime(
+        datetime.fromisoformat(res["createdAt"][:-1])  # isoformatの最後のZを削除してdatetimeに変換
+        + timedelta(hours=config["time_shift"]),  # タイムゾーンの補正
+        "%Y-%m-%dT%H:%M:%S",  # 文字列に変換
+    ).ljust(config["name_len"])  # 文字数を調整
+
+def get_content(res):
+    cw = res["cw"]  # Content Warning
+    content = res["text"]  # 本文
+    if content is not None:  # 本文がある場合
+        # isCat
+        if res["user"]["isCat"]:
+            content = nyaize(content)  # にゃいず
+    else:
+        content = "[No content]"  # 本文がない場合
+    return cw, content
+
+
+def nyaize(content):
+    cat_re_1 = re.compile(r"(na)", re.IGNORECASE)
+    cat_re_2 = re.compile(r"(な)", re.IGNORECASE)
+    cat_re_3 = re.compile(r"(ナ)", re.IGNORECASE)
+
+    content = cat_re_1.sub("nya", content)
+    content = cat_re_2.sub("にゃ", content)
+    content = cat_re_3.sub("ニャ", content)
+
+    return content
