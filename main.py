@@ -81,7 +81,10 @@ def print_data(data, res, config, indent=""):
     for row in data["content"].split("\n"):
         print(" " * indent + row)
     if len(res["fileIds"]) > 0:
-        print(" " * indent + f"({len(res['fileIds'])} file(s))")
+        if len(res["fileIds"]) > 1:
+            print(" " * indent + f"({len(res['fileIds'])} files)")
+        else:
+            print(" " * indent + f"({len(res['fileIds'])} file)")
     if res.get("poll") is not None:
         print(" " * indent + "(Vote)")
 
