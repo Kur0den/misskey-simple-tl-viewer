@@ -2,35 +2,39 @@ import re
 import unicodedata
 from datetime import datetime, timedelta
 
+# 定数定義
+FULL_WIDTH_CHAR_COUNT = 2
+HALF_WIDTH_CHAR_COUNT = 1
+ELLIPSIS = "... "
 
 def name_counter(name):
     count = 0
     for char in name:
         match unicodedata.east_asian_width(char):
             case "W" | "F":  # 全角文字等
-                count += 2  # 2文字分増やす
+                count += FULL_WIDTH_CHAR_COUNT  # 2文字分増やす
             case "a":  # 曖昧な文字
                 pass  # 何もしない
             case _:  # その他
-                count += 1  # 1文字分増やす
+                count += HALF_WIDTH_CHAR_COUNT  # 1文字分増やす
     return count
 
 
 def name_formatter(name, name_len, config):
-    TARGET_LEN = config["name_len"] - len("... ")  # 設定値から...の分を引く
+    TARGET_LEN = config["name_len"] - len(ELLIPSIS)  # 設定値から...の分を引く
     for char in name[::-1]:  #  文字列を逆順にして文字数を減らしていく
         match unicodedata.east_asian_width(char):
             case "W" | "F":  # 全角文字
-                name_len -= 2  # 2文字分減らす
+                name_len -= FULL_WIDTH_CHAR_COUNT  # 2文字分減らす
                 name = name[:-1]
             case "a":  # 曖昧な文字
                 pass  # 何もしない
             case _:  # その他
-                name_len -= 1  # 1文字分減らす
+                name_len -= HALF_WIDTH_CHAR_COUNT  # 1文字分減らす
                 name = name[:-1]
         if name_len <= TARGET_LEN:  # 設定値以下になったらbreak
             break
-    format_name = name + "... "  # 省略を示す...を追加
+    format_name = name + ELLIPSIS  # 省略を示す...を追加
     return format_name
 
 
